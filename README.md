@@ -6,7 +6,7 @@ The primary goal, why I have written it, is to enable tab completion for ssh to 
 
 
 
-## Installation
+## Build and run server 
 ```
 go get -u github.com/spetzreborn/get_host
 ```
@@ -22,6 +22,12 @@ Future version might have support for AXFR with TSIG and/or IXFR
 Starting server
 ```
 ./server -configfile example.toml
+```
+
+## Run server as Docker
+Copy and edit example.toml to ./config/config.toml
+```
+docker run -p 8080:8080/tcp -v $(pwd)/config:/config get_host
 ```
 
 ## Usage
