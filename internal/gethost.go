@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -56,8 +55,7 @@ func Zones(config *Config) []dns.SOA {
 	for _, z := range zones {
 		isFqdn := dns.IsFqdn(z)
 		if isFqdn == false {
-			fmt.Println("zone " + z + " Is not fully qualified. Maybe missing tailing '.'?")
-			os.Exit(0)
+			log.Fatalln("zone " + z + " Is not fully qualified. Maybe missing tailing '.'?")
 		}
 		soa := dns.SOA{}
 		soa.Header().Name = z
@@ -148,8 +146,7 @@ func GetNSforZone(ctx context.Context, zone string) (ns string, err error) {
 	// Get local resolver
 	conf, err := dns.ClientConfigFromFile("/etc/resolv.conf")
 	if conf == nil {
-		fmt.Printf("Cannot initialize the local resolver: %s\n", err)
-		os.Exit(1)
+		log.Fatalf("Cannot initialize the local resolver: %s\n", err)
 	}
 
 	m := new(dns.Msg)

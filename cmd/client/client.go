@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"sort"
 	"strconv"
 	"time"
@@ -20,7 +19,7 @@ import (
 
 	"github.com/stockholmuniversity/goversionflag"
 
-	gethost "gethost/internal"
+	gethost "github.com/spetzreborn/get_host/internal"
 )
 
 func main() {
@@ -37,8 +36,7 @@ func main() {
 
 	config, err := gethost.NewConfig(configFile)
 	if err != nil {
-		log.Println("Got error when parsing configuration file: " + err.Error())
-		os.Exit(1)
+		log.Fatalln("Got error when parsing configuration file: " + err.Error())
 	}
 
 	var hostToGet string
@@ -48,8 +46,7 @@ func main() {
 	}
 
 	if hostToGet == "" && *getAllHosts == false {
-		log.Println("Need part of hostname to match against")
-		os.Exit(1)
+		log.Fatalln("Need part of hostname to match against")
 	}
 
 	var tracer opentracing.Tracer

@@ -9,7 +9,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -43,8 +42,7 @@ func main() {
 
 	config, err := gethost.NewConfig(configFile)
 	if err != nil {
-		log.Println("Got error when parsing configuration file: " + err.Error())
-		os.Exit(1)
+		log.Fatalln("Got error when parsing configuration file: " + err.Error())
 	}
 
 	var closer io.Closer
@@ -185,8 +183,7 @@ func httpResponse(w http.ResponseWriter, r *http.Request, config *gethost.Config
 
 	j, err := json.Marshal(hostnames)
 	if err != nil {
-		log.Println("Error:", err)
-		os.Exit(1)
+		log.Fatalln("Error:", err)
 	}
 
 	if config.Verbose == true {
@@ -253,8 +250,7 @@ func httpStatus(w http.ResponseWriter, r *http.Request, config *gethost.Config) 
 
 	j, err := json.Marshal(ret)
 	if err != nil {
-		log.Println("Error:", err)
-		os.Exit(1)
+		log.Fatalln("Error:", err)
 	}
 
 	fmt.Fprintf(w, string(j))
