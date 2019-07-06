@@ -97,10 +97,11 @@ func GetRRforZone(ctx context.Context, zone string, hostToGet string, c chan Get
 	if config.Verbose == true {
 		log.Printf("Name server for zone %s: %s\n", zone, ns)
 	}
+
 	e, err := t.In(m, ns+":53")
 	if err != nil {
 		if config.Verbose == true {
-			log.Printf("GetRRforZone: Got error from %s:%s ", ns, err)
+			log.Printf("GetRRforZone: Got error for zone %s from %s:%s ", zone, ns, err)
 		}
 		c <- GetRRforZoneResult{Err: err}
 		return
@@ -109,6 +110,13 @@ func GetRRforZone(ctx context.Context, zone string, hostToGet string, c chan Get
 	dnsRR := SOAwithRR{}
 	dnsRR.RR = make(map[string][]dns.RR)
 	for envelope := range e { // Range read from channel e
+		if envelope.Error != nil {
+			if config.Verbose == true {
+				log.Printf("GetRRforZone: Got error for zone %s from %s:%s", zone, ns, envelope.Error) // TODO: Use RcodeToString to transform rcode int to human readable error?
+			}
+			c <- GetRRforZoneResult{Err: envelope.Error}
+			return
+		}
 		for _, rr := range envelope.RR { // Iterate over all Resource Records
 			name := strings.TrimRight(rr.Header().Name, ".")
 			rrtype := rr.Header().Rrtype
