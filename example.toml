@@ -5,7 +5,7 @@
 # Server: This setting is required to be set in the configuration file
 # Client: Only need to be set if used without server
 # These server/client must be able to do AXFR for the zones.
-Zones = [ "zon1.example.tld", "zone2.example.tld" ]
+Zones = [ "zon1.example.tld.", "zone2.example.tld." ]
 
 # Server: The port the server tries to bind to
 # Client: The port to connect to
