@@ -127,11 +127,14 @@ func getFromServer(ctx context.Context, hostToGet string, config *gethost.Config
 	ext.SpanKindRPCClient.Set(span)
 	ext.HTTPUrl.Set(span, url)
 	ext.HTTPMethod.Set(span, "GET")
-	span.Tracer().Inject(
+	err := span.Tracer().Inject(
 		span.Context(),
 		opentracing.HTTPHeaders,
 		opentracing.HTTPHeadersCarrier(req.Header),
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	client := &http.Client{Timeout: 2000 * time.Millisecond}
 	resp, err := client.Do(req)
