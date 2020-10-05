@@ -45,14 +45,14 @@ func main() {
 		hostToGet = flagsLeftover[0]
 	}
 
-	if hostToGet == "" && *getAllHosts == false {
+	if hostToGet == "" && *getAllHosts {
 		log.Fatalln("Need part of hostname to match against")
 	}
 
 	var tracer opentracing.Tracer
 	var closer io.Closer
 
-	if *useTracing == true {
+	if *useTracing {
 		tracer, closer = gethost.JaegerInit("gethost-client")
 		defer closer.Close()
 	} else {
@@ -65,7 +65,7 @@ func main() {
 	ctx := opentracing.ContextWithSpan(context.Background(), span)
 
 	// Server uses hostname/nc to force reload of cache.
-	if *useNC == true {
+	if *useNC {
 		hostToGet = hostToGet + "/nc"
 	}
 	r, err := getFromServer(ctx, hostToGet, config)
@@ -127,7 +127,7 @@ func getFromServer(ctx context.Context, hostToGet string, config *gethost.Config
 	ext.SpanKindRPCClient.Set(span)
 	ext.HTTPUrl.Set(span, url)
 	ext.HTTPMethod.Set(span, "GET")
-	err := span.Tracer().Inject(
+	err = span.Tracer().Inject(
 		span.Context(),
 		opentracing.HTTPHeaders,
 		opentracing.HTTPHeadersCarrier(req.Header),
@@ -144,6 +144,9 @@ func getFromServer(ctx context.Context, hostToGet string, config *gethost.Config
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
 
 	slice := []string{}
 	err = json.Unmarshal(body, &slice)
