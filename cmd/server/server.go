@@ -47,11 +47,11 @@ func main() {
 
 	var closer io.Closer
 
-	if *verbose == true {
+	if *verbose {
 		config.Verbose = true
 	}
 
-	if config.Tracing == true {
+	if config.Tracing {
 		tracer, closer = gethost.JaegerInit("gethost-server")
 		defer closer.Close()
 	} else {
@@ -66,7 +66,7 @@ func main() {
 func schedUpdate(tracer opentracing.Tracer, config *gethost.Config) {
 	log.Printf("Starting scheduled update of cache every %v seconds.\n", config.TTL)
 	for {
-		if config.Verbose == true {
+		if config.Verbose {
 			log.Println("Scheduled update in progress.")
 		}
 		span := tracer.StartSpan("schedUpdate")
@@ -186,10 +186,10 @@ func httpResponse(w http.ResponseWriter, r *http.Request, config *gethost.Config
 		log.Fatalln("Error:", err)
 	}
 
-	if config.Verbose == true {
+	if config.Verbose {
 		log.Println("Send match for " + hostToGet + ": " + string(j))
 	}
-	fmt.Fprintf(w, string(j))
+	fmt.Fprint(w, string(j))
 }
 
 func httpVersion(w http.ResponseWriter, r *http.Request) {
@@ -204,7 +204,7 @@ func httpVersion(w http.ResponseWriter, r *http.Request) {
 	}
 	sort.Strings(buildSlice)
 	for _, v := range buildSlice {
-		fmt.Fprintf(w, v)
+		fmt.Fprint(w, v)
 	}
 	if missingBuildInfo {
 		fmt.Fprintf(w, `Do not have complete buildinfo, see documentaion:
@@ -253,5 +253,5 @@ func httpStatus(w http.ResponseWriter, r *http.Request, config *gethost.Config) 
 		log.Fatalln("Error:", err)
 	}
 
-	fmt.Fprintf(w, string(j))
+	fmt.Fprint(w, string(j))
 }
