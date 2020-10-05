@@ -54,7 +54,7 @@ func Zones(config *Config) []dns.SOA {
 	zones := config.Zones
 	for _, z := range zones {
 		isFqdn := dns.IsFqdn(z)
-		if isFqdn == false {
+		if !isFqdn {
 			log.Fatalln("zone " + z + " Is not fully qualified. Maybe missing tailing '.'?")
 		}
 		soa := dns.SOA{}
@@ -94,13 +94,13 @@ func GetRRforZone(ctx context.Context, zone string, hostToGet string, c chan Get
 		c <- GetRRforZoneResult{Err: err}
 		return
 	}
-	if config.Verbose == true {
+	if config.Verbose {
 		log.Printf("Name server for zone %s: %s\n", zone, ns)
 	}
 
 	e, err := t.In(m, ns+":53")
 	if err != nil {
-		if config.Verbose == true {
+		if config.Verbose {
 			log.Printf("GetRRforZone: Got error for zone %s from %s:%s ", zone, ns, err)
 		}
 		c <- GetRRforZoneResult{Err: err}
@@ -111,7 +111,7 @@ func GetRRforZone(ctx context.Context, zone string, hostToGet string, c chan Get
 	dnsRR.RR = make(map[string][]dns.RR)
 	for envelope := range e { // Range read from channel e
 		if envelope.Error != nil {
-			if config.Verbose == true {
+			if config.Verbose {
 				log.Printf("GetRRforZone: Got error for zone %s from %s:%s", zone, ns, envelope.Error) // TODO: Use RcodeToString to transform rcode int to human readable error?
 			}
 			c <- GetRRforZoneResult{Err: envelope.Error}
@@ -140,7 +140,7 @@ func GetRRforZone(ctx context.Context, zone string, hostToGet string, c chan Get
 	}
 	ret := GetRRforZoneResult{SOA: dnsRR}
 	c <- ret
-	if config.Verbose == true {
+	if config.Verbose {
 		log.Println("Done writing zone", zone)
 	}
 }
@@ -167,7 +167,7 @@ func GetNSforZone(ctx context.Context, zone string) (ns string, err error) {
 	if n, ok := in.Answer[0].(*dns.NS); ok {
 		ns = n.Ns
 	} else {
-		return "", errors.New("Did not get any NS record")
+		return "", errors.New("did not get any NS record")
 	}
 	return ns, nil
 }
