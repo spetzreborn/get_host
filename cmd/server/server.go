@@ -225,6 +225,7 @@ func httpStatus(w http.ResponseWriter, r *http.Request, config *gethost.Config) 
 		Serial uint32 `json:"serial"`
 	}
 
+	dnsRR.RLock()
 	ret := struct {
 		Zones        map[string]zoneSerial
 		Size         int
@@ -241,7 +242,6 @@ func httpStatus(w http.ResponseWriter, r *http.Request, config *gethost.Config) 
 		RefreschRate: config.TTL,
 	}
 
-	dnsRR.RLock()
 	for _, s := range dnsRR.soas {
 		z := s.Header().Name
 		ret.Zones[z] = zoneSerial{Serial: s.Serial}
